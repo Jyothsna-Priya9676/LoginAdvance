@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import api from "../services/api";
 
-import "../styles/auth.css";
+// import "../styles/auth.css";
 
 
 const ForgotPassword = () => {
