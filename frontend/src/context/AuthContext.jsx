@@ -100,7 +100,7 @@ export const AuthProvider = ({ children }) => {
 
 };
     // Logout
-    const login = async (email, password) => {
+  const login = async (email, password) => {
 
     const response = await api.post(
         "/login",
@@ -110,11 +110,18 @@ export const AuthProvider = ({ children }) => {
         }
     );
 
+
     const token = response.data.token;
 
-    localStorage.setItem("token", token);
+
+    localStorage.setItem(
+        "token",
+        token
+    );
+
 
     await checkUser();
+
 
     return response.data;
 
