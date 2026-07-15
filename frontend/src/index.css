@@ -17,7 +17,6 @@
 }
 
 
-
 .logo a {
 
     color: white;
@@ -31,7 +30,6 @@
 }
 
 
-
 .nav-links {
 
     display: flex;
@@ -41,7 +39,6 @@
     gap: 20px;
 
 }
-
 
 
 .nav-links a {
@@ -55,13 +52,11 @@
 }
 
 
-
 .nav-links a:hover {
 
     text-decoration: underline;
 
 }
-
 
 
 .nav-links button {
@@ -83,13 +78,11 @@
 }
 
 
-
 .nav-links button:hover {
 
     background: #e5e7eb;
 
 }
-
 
 
 /* Mobile Responsive */
@@ -116,6 +109,5 @@
         font-size: 18px;
 
     }
-
 
 }
