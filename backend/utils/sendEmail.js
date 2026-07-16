@@ -1,32 +1,22 @@
-const dns = require("dns");
-
-// Fix Render SMTP IPv6 issue
-dns.setDefaultResultOrder("ipv4first");
-
 const nodemailer = require("nodemailer");
-
 
 const sendEmail = async (to, subject, text) => {
 
-    console.log("EMAIL:", process.env.EMAIL);
-    console.log(
-        "APP_PASSWORD:",
-        process.env.APP_PASSWORD ? "Loaded" : "Missing"
-    );
-
-
     const transporter = nodemailer.createTransport({
 
-        service: "gmail",
+        host: "smtp.gmail.com",
+
+        port: 465,
+
+        secure: true,
 
         auth: {
             user: process.env.EMAIL,
             pass: process.env.APP_PASSWORD
         },
 
-        connectionTimeout: 10000,
-        greetingTimeout: 10000,
-        socketTimeout: 10000
+        connectionTimeout: 20000,
+        socketTimeout: 20000
 
     });
 
@@ -34,7 +24,6 @@ const sendEmail = async (to, subject, text) => {
     try {
 
         console.log("Sending email...");
-
 
         const info = await transporter.sendMail({
 
@@ -50,7 +39,7 @@ const sendEmail = async (to, subject, text) => {
 
 
         console.log(
-            "Email sent successfully:",
+            "Email sent:",
             info.messageId
         );
 
@@ -58,9 +47,9 @@ const sendEmail = async (to, subject, text) => {
         return info;
 
 
-    } catch(error) {
+    } catch(error){
 
-        console.error(
+        console.log(
             "EMAIL ERROR:",
             error.message
         );
