@@ -5,13 +5,20 @@ const sendEmail = async (to, subject, text) => {
         console.log("EMAIL:", process.env.EMAIL);
         console.log("APP_PASSWORD:", process.env.APP_PASSWORD ? "Loaded" : "Missing");
 
-        const transporter = nodemailer.createTransport({
-            service: "gmail",
-            auth: {
-                user: process.env.EMAIL,
-                pass: process.env.APP_PASSWORD,
-            },
-        });
+       const transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false,
+    auth: {
+        user: process.env.EMAIL,
+        pass: process.env.APP_PASSWORD,
+    },
+    family: 4, // Force IPv4
+});
+
+        console.log("Verifying transporter...");
+        await transporter.verify();
+        console.log("Transporter verified");
 
         console.log("Sending email...");
 
@@ -22,7 +29,7 @@ const sendEmail = async (to, subject, text) => {
             text,
         });
 
-        console.log("Email sent successfully:", info.messageId);
+        console.log("Email sent:", info.messageId);
 
     } catch (error) {
         console.error("EMAIL ERROR:", error);
