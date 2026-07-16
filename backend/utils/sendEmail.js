@@ -1,60 +1,84 @@
+const dns = require("dns");
+
+// Force IPv4 for Gmail SMTP on Render
+dns.setDefaultResultOrder("ipv4first");
+
 const nodemailer = require("nodemailer");
+
 
 const sendEmail = async (to, subject, text) => {
 
     try {
 
+        console.log("EMAIL:", process.env.EMAIL);
+        console.log(
+            "APP_PASSWORD:",
+            process.env.APP_PASSWORD ? "Loaded" : "Missing"
+        );
+
+
         const transporter = nodemailer.createTransport({
 
-            service: "gmail",
+            host: "smtp.gmail.com",
+
+            port: 587,
+
+            secure: false,
+
+            family: 4,
 
             auth: {
                 user: process.env.EMAIL,
                 pass: process.env.APP_PASSWORD
             },
 
-            pool: true,
-
-            maxConnections: 1,
+            tls: {
+                rejectUnauthorized: false
+            },
 
             connectionTimeout: 30000,
-
+            greetingTimeout: 30000,
             socketTimeout: 30000
 
         });
 
 
-        console.log("Checking SMTP...");
+        console.log("Checking SMTP connection...");
+
 
         await transporter.verify();
 
-        console.log("SMTP READY");
+
+        console.log("SMTP connection successful");
 
 
-        const mail = await transporter.sendMail({
+        const info = await transporter.sendMail({
 
             from: process.env.EMAIL,
 
-            to,
+            to: to,
 
-            subject,
+            subject: subject,
 
-            text
+            text: text
 
         });
 
 
         console.log(
-            "MAIL SENT:",
-            mail.messageId
+            "Email sent:",
+            info.messageId
         );
 
 
-    } catch(error){
+        return info;
+
+
+    } catch(error) {
 
         console.log(
             "EMAIL ERROR:",
-            error
+            error.message
         );
 
         throw error;
