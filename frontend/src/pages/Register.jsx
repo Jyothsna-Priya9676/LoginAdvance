@@ -1,15 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
 import api from "../services/api";
-
 import "../styles/auth.css";
-
 
 const Register = () => {
 
     const navigate = useNavigate();
-
 
     const [formData, setFormData] = useState({
         name: "",
@@ -17,82 +13,57 @@ const Register = () => {
         password: "",
     });
 
-
     const [message, setMessage] = useState("");
-
-
+    const [loading, setLoading] = useState(false);
 
     const handleChange = (e) => {
-
         setFormData({
             ...formData,
             [e.target.name]: e.target.value,
         });
-
     };
 
-
-
     const handleSubmit = async (e) => {
-
         e.preventDefault();
 
+        // Prevent duplicate submissions
+        if (loading) return;
+
+        
+
+        setLoading(true);
 
         try {
 
-            const response = await api.post(
-                "/register",
-                formData
-            );
-
-
+            const response = await api.post("/register", formData);
             setMessage(response.data.message);
 
-
-            // Save email for OTP page
-            localStorage.setItem(
-                "verifyEmail",
-                formData.email
-            );
-
+            localStorage.setItem("verifyEmail", formData.email);
 
             setTimeout(() => {
-
                 navigate("/verify-otp");
-
             }, 1000);
-
-
 
         } catch (error) {
 
-
             setMessage(
-                error.response?.data?.message ||
-                "Registration failed"
+                error.response?.data?.message || "Registration failed"
             );
 
+        } finally {
+            setLoading(false);
         }
-
     };
 
-
-
     return (
-
         <div className="auth-container">
 
-
-            <form 
+            <form
                 className="auth-form"
                 onSubmit={handleSubmit}
             >
 
-                <h2>
-                    Create Account
-                </h2>
-
-
+                <h2>Create Account</h2>
 
                 <input
                     type="text"
@@ -100,9 +71,8 @@ const Register = () => {
                     placeholder="Name"
                     value={formData.name}
                     onChange={handleChange}
+                    required
                 />
-
-
 
                 <input
                     type="email"
@@ -110,9 +80,8 @@ const Register = () => {
                     placeholder="Email"
                     value={formData.email}
                     onChange={handleChange}
+                    required
                 />
-
-
 
                 <input
                     type="password"
@@ -120,32 +89,22 @@ const Register = () => {
                     placeholder="Password"
                     value={formData.password}
                     onChange={handleChange}
+                    required
                 />
 
-
-
-                <button type="submit">
-                    Register
+                <button
+                    type="submit"
+                    disabled={loading}
+                >
+                    {loading ? "Registering..." : "Register"}
                 </button>
 
-
-
-                {
-                    message && 
-                    <p>
-                        {message}
-                    </p>
-                }
-
+                {message && <p>{message}</p>}
 
             </form>
 
-
         </div>
-
     );
-
 };
-
 
 export default Register;

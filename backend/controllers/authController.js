@@ -2,41 +2,21 @@ const User = require("../models/user");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const sendEmail = require("../utils/sendEmail");
-
-/* ===========================
-   REGISTER
-=========================== */
-
 exports.register = async (req, res) => {
     try {
         const { name, email, password } = req.body;
 
-        if (!name || !email || !password) {
+        const existingUser = await User.findOne({ email });
+
+        if (existingUser) {
+            console.log("User already exists");
             return res.status(400).json({
                 success: false,
-                message: "Please fill all fields",
+                message: "User already registered",
             });
         }
 
-        // const existingUser = await User.findOne({ email });
-
-        // if (existingUser) {
-        //     return res.status(400).json({
-        //         success: false,
-        //         message: "User already registered",
-        //     });
-        // }
-        const existingUser = await User.findOne({ email });
-
-console.log("Email from frontend:", email);
-console.log("Existing User:", existingUser);
-
-if (existingUser) {
-    return res.status(400).json({
-        success: false,
-        message: "User already registered",
-    });
-}
+        console.log("Creating new user...");
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -61,6 +41,7 @@ if (existingUser) {
             `Your OTP is ${otp}. It is valid for 10 minutes.`
         );
 
+
         return res.status(201).json({
             success: true,
             message: "Registration successful. OTP sent to your email.",
@@ -75,10 +56,6 @@ if (existingUser) {
         });
     }
 };
-
-/* ===========================
-   VERIFY OTP
-=========================== */
 
 exports.verifyOTP = async (req, res) => {
     try {
@@ -166,9 +143,7 @@ exports.login = async (req, res) => {
                 success: false,
                 message: "Invalid Password",
             });
-        }
-console.log("JWT SECRET:", process.env.JWT_SECRET);
-        const accessToken = jwt.sign(
+        }        const accessToken = jwt.sign(
             {
                 id: existingUser._id,
                 email: existingUser.email,
@@ -178,8 +153,6 @@ console.log("JWT SECRET:", process.env.JWT_SECRET);
                 expiresIn: "15m",
             }
         );
-        console.log("JWT SECRET:", process.env.JWT_SECRET);
-
         const refreshToken = jwt.sign(
             {
                 id: existingUser._id,
@@ -189,14 +162,13 @@ console.log("JWT SECRET:", process.env.JWT_SECRET);
                 expiresIn: "7d",
             }
         );
-
         existingUser.refreshToken = refreshToken;
 
         await existingUser.save();
 
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
-            secure: false,
+          secure: process.env.NODE_ENV === "production",
             sameSite: "strict",
             maxAge: 7 * 24 * 60 * 60 * 1000,
         });
