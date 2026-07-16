@@ -23,39 +23,51 @@ const Register = () => {
         });
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+   const handleSubmit = async (e) => {
 
-        if (loading) return;
+    e.preventDefault();
 
-        setLoading(true);
+    if (loading) return;
 
-        try {
-            const response = await api.post("/register", formData);
+    setLoading(true);
 
-            setMessage(response.data.message);
+    try {
 
-            localStorage.setItem(
-                "verifyEmail",
-                formData.email
-            );
+        const response = await api.post(
+            "/register",
+            formData
+        );
 
-            setTimeout(() => {
-                navigate("/verify-otp");
-            }, 1000);
+        console.log("REGISTER SUCCESS:", response.data);
 
-        } catch (error) {
 
-            setMessage(
-                error.response?.data?.message ||
-                "Registration failed"
-            );
+        localStorage.setItem(
+            "verifyEmail",
+            formData.email
+        );
 
-        } finally {
-            setLoading(false);
-        }
-    };
 
+        navigate("/verify-otp");
+
+
+    } catch(error) {
+
+        console.log("REGISTER ERROR:", error);
+
+
+        setMessage(
+            error.response?.data?.message ||
+            "Registration failed"
+        );
+
+
+    } finally {
+
+        setLoading(false);
+
+    }
+
+};
     return (
         <div className="auth-container">
 

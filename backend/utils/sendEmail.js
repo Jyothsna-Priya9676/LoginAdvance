@@ -1,6 +1,6 @@
 const dns = require("dns");
 
-// Force IPv4 (fix Render IPv6 SMTP issue)
+// Fix Render SMTP IPv6 issue
 dns.setDefaultResultOrder("ipv4first");
 
 const nodemailer = require("nodemailer");
@@ -8,34 +8,30 @@ const nodemailer = require("nodemailer");
 
 const sendEmail = async (to, subject, text) => {
 
+    console.log("EMAIL:", process.env.EMAIL);
+    console.log(
+        "APP_PASSWORD:",
+        process.env.APP_PASSWORD ? "Loaded" : "Missing"
+    );
+
+
+    const transporter = nodemailer.createTransport({
+
+        service: "gmail",
+
+        auth: {
+            user: process.env.EMAIL,
+            pass: process.env.APP_PASSWORD
+        },
+
+        connectionTimeout: 10000,
+        greetingTimeout: 10000,
+        socketTimeout: 10000
+
+    });
+
+
     try {
-
-        console.log("EMAIL:", process.env.EMAIL);
-        console.log(
-            "APP_PASSWORD:",
-            process.env.APP_PASSWORD ? "Loaded" : "Missing"
-        );
-
-
-        const transporter = nodemailer.createTransport({
-
-            host: "smtp.gmail.com",
-
-            port: 587,
-
-            secure: false,
-
-            auth: {
-                user: process.env.EMAIL,
-                pass: process.env.APP_PASSWORD
-            },
-
-            tls: {
-                rejectUnauthorized: false
-            }
-
-        });
-
 
         console.log("Sending email...");
 
@@ -53,15 +49,21 @@ const sendEmail = async (to, subject, text) => {
         });
 
 
-        console.log("Email sent successfully:", info.messageId);
+        console.log(
+            "Email sent successfully:",
+            info.messageId
+        );
 
 
         return info;
 
 
-    } catch (error) {
+    } catch(error) {
 
-        console.error("EMAIL ERROR:", error);
+        console.error(
+            "EMAIL ERROR:",
+            error.message
+        );
 
         throw error;
 

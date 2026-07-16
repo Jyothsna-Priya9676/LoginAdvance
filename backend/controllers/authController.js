@@ -40,18 +40,19 @@ exports.register = async (req, res) => {
 
         await newUser.save();
 
-        await sendEmail(
-            email,
-            "Email Verification OTP",
-            `Your OTP is ${otp}. It is valid for 10 minutes.`
-        );
+       sendEmail(
+    email,
+    "Email Verification OTP",
+    `Your OTP is ${otp}. It is valid for 10 minutes.`
+).catch((err)=>{
+    console.log("EMAIL ERROR:", err.message);
+});
 
 
-        return res.status(201).json({
-            success: true,
-            message: "Registration successful. OTP sent to your email.",
-        });
-
+return res.status(201).json({
+    success:true,
+    message:"Registration successful. OTP sent to your email.",
+});
     } catch (error) {
     console.error("Register Error:", error);
 
