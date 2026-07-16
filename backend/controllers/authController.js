@@ -48,13 +48,14 @@ exports.register = async (req, res) => {
         });
 
     } catch (error) {
-        console.log(error);
+    console.error("Register Error:", error);
 
-        return res.status(500).json({
-            success: false,
-            message: "Internal Server Error",
-        });
-    }
+    return res.status(500).json({
+        success: false,
+        message: "Internal Server Error",
+        error: error.message
+    });
+}
 };
 
 exports.verifyOTP = async (req, res) => {
