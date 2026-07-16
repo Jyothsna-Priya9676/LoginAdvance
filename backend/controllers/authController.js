@@ -4,6 +4,13 @@ const jwt = require("jsonwebtoken");
 const sendEmail = require("../utils/sendEmail");
 exports.register = async (req, res) => {
     try {
+        console.log("Request Body:", req.body);
+
+        const { name, email, password } = req.body;
+
+        console.log(name, email, password);
+
+        // rest of your code...
         const { name, email, password } = req.body;
 
         const existingUser = await User.findOne({ email });
